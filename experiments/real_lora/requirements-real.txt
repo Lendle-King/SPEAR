@@ -1,0 +1,8 @@
+# CUDA machine: match PyTorch wheels to the installed driver.
+# CPU protocol checks require no third-party Python packages.
+torch>=2.3
+transformers>=4.51
+peft>=0.13
+accelerate>=1.0
+bitsandbytes>=0.44
+safetensors>=0.4
