@@ -17,7 +17,7 @@ Core research objects:
 - [Literature and originality audit](paper/RELATED_WORK.md)
 - [Bibliography](paper/references.bib)
 
-Compile with \`cd paper && make\` in a TeX Live environment. A GitHub Actions build definition is included in the paper branch; PDF availability depends on GitHub Actions execution.
+Compile with `cd paper && make` in a TeX Live environment. A GitHub Actions build definition is included in the paper branch; PDF availability depends on GitHub Actions execution.
 
 **Research status (2026-10-30):** method proposal and planned experiments; there are no measured SPEAR results in this draft. The paper does not claim an established scientific contribution before the causal and persistence tests succeed.
 

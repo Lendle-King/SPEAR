@@ -73,16 +73,16 @@ Each record should include:
 
 | Field | Meaning |
 |---|---|
-| \`run_id\`, \`skill_family\`, \`mechanism_id\`, \`split\` | Immutable trial identity and isolation |
-| \`model_checkpoint_sha\`, \`basis_sha\`, \`generator_version\`, \`source_policy_version\` | Causal treatment provenance |
-| \`environment_image\`, \`reset_snapshot_id\`, \`task_seed\` | Exact replay target |
-| \`visible_failure_id\`, \`trace_hash\` | Matched observable state |
-| \`source_action\`, \`action_propensity\`, \`evidence_hash\`, \`source_provenance\` | Acquisition assignment and response |
-| \`teacher_tokens\`, \`search_bytes\`, \`probe_steps\`, \`gpu_seconds\` | Full intervention cost |
-| \`candidate_id\`, \`delta_hash\`, \`is_zero_update\` | Proposal and null comparator |
-| \`baseline_checker\`, \`candidate_checker\`, \`episode_done\`, \`side_effects\` | Actual paired outcome |
-| \`old_skill_pre\`, \`old_skill_post\`, \`accepted\`, \`rollback_reason\` | Persistence / retention decision |
-| \`heldout_evaluation\`, \`selection_eligible\` | Leakage control |
+| `run_id`, `skill_family`, `mechanism_id`, `split` | Immutable trial identity and isolation |
+| `model_checkpoint_sha`, `basis_sha`, `generator_version`, `source_policy_version` | Causal treatment provenance |
+| `environment_image`, `reset_snapshot_id`, `task_seed` | Exact replay target |
+| `visible_failure_id`, `trace_hash` | Matched observable state |
+| `source_action`, `action_propensity`, `evidence_hash`, `source_provenance` | Acquisition assignment and response |
+| `teacher_tokens`, `search_bytes`, `probe_steps`, `gpu_seconds` | Full intervention cost |
+| `candidate_id`, `delta_hash`, `is_zero_update` | Proposal and null comparator |
+| `baseline_checker`, `candidate_checker`, `episode_done`, `side_effects` | Actual paired outcome |
+| `old_skill_pre`, `old_skill_post`, `accepted`, `rollback_reason` | Persistence / retention decision |
+| `heldout_evaluation`, `selection_eligible` | Leakage control |
 
 Unknown or technically errored outcomes must remain explicitly **unknown**; do not reclassify as model failure or exclude without reporting.
 
