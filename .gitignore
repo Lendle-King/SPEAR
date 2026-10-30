@@ -12,3 +12,11 @@
 *.lot
 paper/main.pdf
 .DS_Store
+
+# Local Python experiment outputs (keep selected committed summary)
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+results/parameter_voi_cpu/
+experiments/parameter_voi/results/*.jsonl

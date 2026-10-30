@@ -100,3 +100,9 @@ Unknown or technically errored outcomes must remain explicitly **unknown**; do n
 ## Reporting rule
 
 Before a claimed result appears in the manuscript, provide the raw-run path, code commit, configuration digest, pre-registered analysis file, and checker audit. Empty result cells are preferable to invented numbers or comparisons across incompatible budgets.
+
+## 2026-10-30 implementation / audit update
+
+The planned mechanism gates now have a runnable **synthetic** implementation in [`experiments/parameter_voi/`](../experiments/parameter_voi/README.md) with standard-library Python, 19 tests, reproducible CLI, raw-run JSONL exports, matched-pair confidence intervals, and a real-run JSONL audit adapter. The CI workflow is [`verify-parameter-voi.yml`](../.github/workflows/verify-parameter-voi.yml). A seed-42 [toy result audit](../experiments/parameter_voi/results/interpretation.md) is tracked separately from the paper.
+
+**Do not regard those simulated tests as the manuscript's empirical Results.** In the toy benchmark a strong readiness rule matches learned PI-VOI within uncertainty, while a static semantic direction matches the learned intervention generator exactly; external model/agent experiments are necessary. The real-model G1–G4 gates in this document remain unpassed.

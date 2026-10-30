@@ -22,3 +22,12 @@ Compile with `cd paper && make` in a TeX Live environment. A GitHub Actions buil
 **Research status (2026-10-30):** method proposal and planned experiments; there are no measured SPEAR results in this draft. The paper does not claim an established scientific contribution before the causal and persistence tests succeed.
 
 **Naming note:** a different agentic-RL method already used **SPEAR** in [Qin et al. (2025/ICLR 2026)](https://arxiv.org/abs/2509.22601). The acronym here is provisional pending a submission decision.
+
+## Executable verification experiments (CPU smoke test)
+
+- [Reproducible PI-VOI intervention experiments](experiments/parameter_voi/README.md)
+- [Synthetic seed-42 result audit](experiments/parameter_voi/results/interpretation.md) and [machine-readable summary](experiments/parameter_voi/results/synthetic_seed42_summary.json)
+- [Real LLM paired-run audit validator](experiments/parameter_voi/external_audit.py) (requires independent real runner logs)
+- [GitHub Actions validation](.github/workflows/verify-parameter-voi.yml): 19 invariant/unit tests, deterministic synthetic experiment, raw trial artifacts
+
+**Important distinction:** the CPU experiment changes persistent parameters of a tiny toy model, **not** a Qwen/AndroidWorld agent. On the seeded synthetic benchmark PI-VOI does not meaningfully beat the strong same-input readiness rule, and its learned intervention generator ties the static semantic rule. These negative controls remain visible; genuine LLM evidence is not yet reported.
