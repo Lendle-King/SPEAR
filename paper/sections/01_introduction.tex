@@ -1,0 +1,71 @@
+\section{Introduction}
+\label{sec:introduction}
+
+An agent operating a website, software toolchain, or mobile interface can
+encounter a failure in the middle of a long trajectory. A language-model
+consultant may explain the error; a retrieved manual may reveal a violated
+precondition; a resettable simulator may disambiguate two candidate recovery
+strategies. These are fundamentally different sources of evidence.
+If the goal is only to finish the \emph{current} task, the agent can use the
+evidence in context and move on. If the goal is to improve \emph{future}
+behavior, however, it must decide whether and how to translate the evidence
+into a durable model update.
+
+Verbal feedback and episodic memory can improve behavior without changing
+model weights \citep{shinn2023reflexion}. Self-adaptation can instead produce
+persistent updates: SEAL learns to generate self-edits whose resulting
+fine-tuning improves performance \citep{zweiger2025seal}. Other systems jointly
+modify scaffolds and weights \citep{hebbar2026sia}; parametric skill synthesis
+and task-conditioned adapter prediction are increasingly capable
+\citep{dery2026skillsmith,han2026kvskill,khan2026distributional}.
+Consequently, asking a teacher, generating an adapter, and testing it is not
+by itself a distinctive technical contribution.
+
+We study a more specific decision. Consider two failures with deliberately
+indistinguishable visible traces. In one case, the tool's schema has silently
+changed; in the other, a task invariant makes the apparently valid call
+incorrect. Retrieving documentation may resolve the first cause, whereas an
+expert explanation or controlled counterfactual trial may be necessary for
+the second. A useful learner should select evidence \emph{based on which
+permanent parameter change that evidence will make possible}, not simply
+which source seems relevant or reduces linguistic uncertainty.
+
+This distinction motivates \emph{parameter-aware evidence acquisition}.
+The evidence is valued through the posterior expected utility of a candidate
+parameter intervention on \emph{fresh, independent trajectories}, including
+training expense and retention of existing abilities. The zero-update
+option is explicit. A diagnostic can thus be correct and still not be worth
+acquiring if it does not change the intervention decision. Conversely, a
+brief probe may be worth more than a long explanation if it reverses the
+preferred parameter update.
+
+We propose \spear{} as a research framework organized around three
+interlocking objects:
+\begin{enumerate}
+\item \textbf{Parameter-intervention value of information (\pivoi).}
+      Evaluate a source by expected improvement in the \emph{best downstream
+      parameter decision}, not by source confidence or textual quality.
+\item \textbf{Evidence-conditioned functional interventions.}
+      Map a failure state and the gathered evidence to a constrained update
+      in a reusable functional basis with a small residual, scored against
+      observed intervention outcomes.
+\item \textbf{Outcome-driven recursive learning.}
+      Use paired candidate trials and old-skill audits to update both the
+      evidence policy and the intervention generator, while separately
+      verifying persistent changes to the execution model.
+\end{enumerate}
+
+The intended contribution is a \emph{testable coupling} between evidence
+acquisition and parameter modification. We do not claim that value-of-information
+planning, hypernetworks, functional subspaces, or recursive adaptation are
+individually new. In particular, our experimental design includes strong
+uncombined and fully cost-matched controls. The core falsification question is
+whether a learned parameter-aware policy outperforms simple error-condition
+rules and fixed evidence under matched opportunities to update.
+
+\paragraph{Scope and status.}
+This draft specifies a method and an evaluation plan, not a completed system
+or a report of results. The first implementation target is a small
+tool-using language model and resettable, state-checkable environments;
+cross-architecture generalization and unbounded autonomous improvement are
+out of scope.
