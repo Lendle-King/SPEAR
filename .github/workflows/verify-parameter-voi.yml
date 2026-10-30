@@ -3,6 +3,7 @@ name: SPEAR PI-VOI synthetic verification
 on:
   push:
     branches:
+      - main
       - 'paper/**'
     paths:
       - 'experiments/**'
