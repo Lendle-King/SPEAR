@@ -1,0 +1,286 @@
+\section{SPEAR: Parameter-Aware Self-Improvement}
+\label{sec:method}
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[>=Latex, every node/.style={font=\small},
+  stage/.style={draw=blue!55!black,rounded corners=3pt,thick,
+  fill=blue!3,align=center,minimum height=0.95cm,text width=3.1cm},
+  minor/.style={draw=gray!65,rounded corners=3pt,
+  fill=gray!5,align=center,minimum height=0.85cm,text width=3.1cm}]
+\node[stage] (failure) at (1.7,0) {\textbf{Agent failure state}\\trace, checkpoint, budget};
+\node[stage] (query) at (5.7,0) {\textbf{Parameter-aware query}\\estimate PI-VOI; choose source};
+\node[stage] (evidence) at (9.7,0) {\textbf{Evidence acquisition}\\teacher / retrieval / probe};
+\node[stage] (propose) at (13.7,0) {\textbf{Functional intervention}\\basis coefficients + residual};
+\node[minor] (verify) at (13.7,-1.85) {\textbf{Paired validation}\\retention, cost, rollback};
+\node[minor] (replay) at (5.7,-1.85) {\textbf{Outcome replay}\\train query and update policies};
+\draw[->,thick] (failure.east)--(query.west);
+\draw[->,thick] (query.east)--(evidence.west);
+\draw[->,thick] (evidence.east)--(propose.west);
+\draw[->,thick] (propose.south)--(verify.north);
+\draw[->,thick] (verify.west)--node[above,font=\scriptsize]{measured intervention outcome}(replay.east);
+\draw[->,thick] (replay.north)--(query.south);
+\draw[->,dashed,gray] (verify.south) -- ++(0,-0.37) -| (failure.south);
+\end{tikzpicture}
+\caption{Proposed \spear{} loop. The diagnostic policy is trained on
+\emph{verified post-update outcomes}, not the superficial correctness of
+an explanation. A candidate can be rejected or replaced by a no-update
+decision; only an accepted update persists to future episodes.}
+\label{fig:architecture}
+\end{figure*}
+
+\subsection{Decision State and the Update Objective}
+Let $\theta_t\in\R^d$ denote the \emph{persistent} parameters of a
+student agent at improvement round $t$. A long-horizon interaction
+produces a partial trajectory $h_t=(o_0,a_0,\ldots,o_k)$ that contains
+an observed failure or capability gap. The decision state is
+\begin{equation}
+s_t=(h_t,\theta_t,D_t,b_t,\M_t),
+\end{equation}
+where $D_t$ is a functional update basis, $b_t$ is the remaining
+resource budget, and $\M_t$ is a log of prior evidence decisions,
+parameter proposals, and evaluated outcomes. A source action
+$a\in\A_{\mathrm{src}}$ may query a teacher, retrieve external
+documentation, run a controlled environment probe, or stop.
+An outcome $e\sim P_t(e\mid s_t,a)$ includes the acquired content,
+source, cost, timestamp, and provenance. The distribution $P_t$ is
+unknown and may vary with model checkpoint and environment version.
+
+The available parameter interventions constitute a bounded set
+$\Delta_t$, augmented with $\delta=0$; the latter is important because
+the correct decision can be to retain the current checkpoint.
+A \emph{memory-only} remedy is a separate non-parametric comparator:
+it may improve current-task utility but does not count as durable
+parameter improvement.
+
+Let $\mathcal{T}^{\rm new}_t$ be independent future task instances from
+the target skill distribution and $\mathcal{T}^{\rm old}_t$ a retention
+suite of previously learned tasks. Denote strict episode success by
+$S(\theta;z)\in[0,1]$, evaluated by the environment's state checker.
+Define the net \emph{update value}
+\begin{align}
+J_t(\delta) ={}&
+  \E_{z\sim\mathcal{T}^{\rm new}_t}[S(\theta_t+\delta;z)]
+     \nonumber\\
+ &-\lambda_F\Big[
+     \E_{z\sim\mathcal{T}^{\rm old}_t}
+     \big(S(\theta_t;z)-S(\theta_t+\delta;z)\big)
+   \Big]_+ \nonumber\\
+ &-\lambda_U C_{\rm update}(\delta).
+\label{eq:updatevalue}
+\end{align}
+Here $[x]_+=\max(x,0)$ and $C_{\rm update}$ accounts for actual
+training, evaluation, and deployment cost; the separate source cost is
+denoted $c_{\rm src}(a)$. The weights and normalization must be fixed
+\emph{before} testing. Performance on a final held-out test set must
+not enter training, policy selection, or the acceptance gate.
+
+\subsection{Parameter-Intervention Value of Information}
+\label{sec:pivoi}
+Given history $\M_t$, define the conditional expected utility of
+an intervention after observing possible evidence $e$:
+\begin{equation}
+\mu_t(\delta\mid s_t,e,\M_t)
+=\E[J_t(\delta)\mid s_t,e,\M_t].
+\label{eq:mu}
+\end{equation}
+The proposed one-step \emph{parameter-intervention value of
+information} for a source action is
+\begin{align}
+V^{\rm PI}_t(a\mid s_t,\M_t)
+={}&\E_{e\sim P_t(\cdot\mid s_t,a)}
+  \left[
+  \max_{\delta\in\Delta_t\cup\{0\}}
+  \mu_t(\delta\mid s_t,e,\M_t)
+  \right]\nonumber\\
+ &-\max_{\delta\in\Delta_t\cup\{0\}}
+  \mu_t(\delta\mid s_t,\M_t)
+  -c_{\rm src}(a).
+\label{eq:pivoi}
+\end{align}
+The second term is the best available parameter decision without
+paying for further evidence. Crucially, a source is not rewarded
+for reducing uncertainty unless the reduction improves the
+\emph{downstream intervention choice}. This is a decision-dependent
+instance of classical value of information, \emph{not} a new
+information-theoretic identity.
+
+\begin{proposition}[Nonnegative gross value under ideal decisions]
+\label{prop:voi}
+Suppose the source does not itself alter $\theta_t$, all candidate
+interventions remain available, the utility model is Bayes-correct,
+and source cost is zero. Then the first two terms of
+Eq.~\eqref{eq:pivoi} have nonnegative difference.
+\end{proposition}
+\noindent\textit{Proof.}
+Let $\delta^\star$ maximize expected utility before acquisition.
+After seeing $e$, the decision-maker can always select
+$\delta^\star$. Taking expectations over $e$ and applying the law
+of iterated expectations yields an expected post-query optimum
+no smaller than the pre-query optimum. \hfill$\square$
+
+This result is only an ideal benchmark: when queries are costly,
+evidence is distribution-shifting, or $\mu_t$ is miscalibrated,
+the estimated net value and the \emph{realized} gain can be negative.
+A myopic policy chooses
+$a_t=\arg\max_a\widehat V^{\rm PI}_t(a\mid s_t,\M_t)$
+when that maximum is positive, otherwise stopping.
+Sequential acquisition re-evaluates the same criterion after each
+observation within budget. A one-step approximation does not
+generally solve the optimal multi-step experimental-design problem.
+
+\subsection{Estimating Parameter-Aware Evidence Value}
+\label{sec:valuelearning}
+We propose a learned intervention-value model
+$Q_\omega(s,e,\delta)$, trained to predict the measured change
+$J_t(\delta)-J_t(0)$, together with a calibrated uncertainty estimate
+$\sigma_\omega$. For each randomized evidence decision and feasible
+candidate $\delta$, the training log stores the \emph{actual} paired
+validation outcome, cost, environment seed, and versioned checkpoint.
+The conditional evidence model
+$\widehat P_\xi(e\mid s,a)$ is optional; a direct
+source-value regressor is a lower-complexity alternative when sampling
+full textual evidence is impractical.
+
+A practical source-value estimator simulates a limited set of
+candidate evidence outcomes and updates:
+\begin{equation}
+\widehat V^{\rm PI}(a)
+= \frac{1}{K}\sum_{i=1}^K
+ \max_{\delta\in\widehat\Delta(s,e_i)}
+ Q_\omega(s,e_i,\delta)
+ -\max_{\delta\in\widehat\Delta(s)}
+ Q_\omega(s,\varnothing,\delta)-c_{\rm src}(a).
+\label{eq:est}
+\end{equation}
+Here $e_i\sim\widehat P_\xi(\cdot\mid s,a)$ and every candidate set
+includes zero. This is an \emph{approximation}, not an unbiased
+counterfactual estimator. Limited candidate search and maximization
+of noisy scores can be optimistic; calibration on a separate
+validation split, uncertainty penalties, and occasional random
+source exploration are necessary. Logged source propensities must
+be retained for subsequent off-policy evaluation.
+
+\subsection{Evidence-to-Functional Intervention}
+\label{sec:generator}
+Let $D_t\in\R^{d\times k}$ comprise $k\ll d$ reusable parameter
+directions from previously \emph{validated} updates. The proposed
+generator predicts both basis coefficients and a bounded residual:
+\begin{equation}
+\delta_\phi(s_t,e)=
+    D_t g_\phi(s_t,e)+r_\phi(s_t,e),\qquad
+    \|r_\phi\|_2\le \kappa,\ \|\delta_\phi\|_2\le R.
+\label{eq:functional}
+\end{equation}
+For large weight matrices, $r_\phi$ can be represented by small
+low-rank factors or omitted in the minimal implementation.
+The generator receives structured history and evidence provenance,
+not just the consultant's natural-language answer. A finite library
+of pre-trained directions with learned mixture coefficients is a
+crucial low-cost baseline for the full generator.
+
+A value-grounded training objective is
+\begin{align}
+\mathcal{L}_{\rm int}(\phi)
+={}&-\E_{(s,e)\sim\M}
+ \big[Q_\omega(s,e,\delta_\phi(s,e))\big]\nonumber\\
+ &+\lambda_{\rm res}\|r_\phi(s,e)\|_2^2
+ +\lambda_{\rm trust}\|\delta_\phi(s,e)\|_2^2.
+\label{eq:generatorloss}
+\end{align}
+The model must not trust this surrogate alone; it proposes candidates
+for \emph{real execution}, and a high predicted value is not a
+validation pass. Direction reuse can be expanded only after
+independently verified improvements. Directions must be attached
+to a compatible checkpoint, layer layout, and parameter
+normalization; cross-backbone transfer is not assumed.
+
+\subsection{Counterfactual Acceptance and Persistence}
+\label{sec:verification}
+Each candidate update is evaluated against the \emph{same}
+pre-update checkpoint on paired, independently initialized task
+instances. For every evaluation seed, run both $\theta_t$ and
+$\theta_t+\delta$ from equivalent environment state, recording
+strict success and side effects. Keep data used to create the
+candidate disjoint from its validation data, and never select on
+the final test split. An acceptance rule can require a positive
+pre-specified lower confidence bound on the new-skill gain and an
+old-skill regression below tolerance $\epsilon_F$:
+\begin{equation}
+\mathrm{LCB}_{1-\alpha}(\Delta U_{\rm new})>0,\quad
+\mathrm{UCB}_{1-\alpha}(F_{\rm old})\le\epsilon_F.
+\label{eq:accept}
+\end{equation}
+The confidence construction, multiplicity correction, and number
+of repeats must be pre-registered. When either check fails,
+rollback to $\theta_t$; accept $\delta=0$ if no proposal passes.
+
+When accepted, \emph{persist} the update as a versioned adapter or
+merge it into a new checkpoint, yielding
+$\theta_{t+1}=\theta_t+\delta_t^\star$.
+At the next evaluation episode, disable the original teacher
+message and retrieved document. If improvements require reloading
+temporary query-specific adapters or re-injecting the diagnosis,
+classify the effect as transient adaptation rather than persistent
+parameter learning.
+
+\subsection{Recursive Learning of the Update Mechanism}
+\label{sec:recursive}
+Define the learned self-improvement machinery as
+$\psi_t=(\eta_t,\phi_t,\omega_t,\xi_t)$, where $\eta_t$
+is the diagnostic source policy, $\phi_t$ the generator, and the
+remaining components are value/evidence predictors.
+After each verified trial, update
+\begin{equation}
+(\theta_t,\psi_t,\M_t)
+\longrightarrow
+(\theta_{t+1},\psi_{t+1},\M_{t+1}).
+\label{eq:recursion}
+\end{equation}
+A constrained contextual-bandit or off-policy policy-gradient
+loss for $\eta$ can use \emph{measured intervention gain minus
+acquisition cost}, with recorded randomized action propensities.
+The generator is trained with Eq.~\eqref{eq:generatorloss} and
+ground-truth acceptance/rejection feedback. All outcomes are
+versioned because $Q_\omega$ at a prior $\theta_t$ need not
+generalize to the next checkpoint.
+
+\begin{algorithm}[t]
+\caption{Proposed SPEAR improvement round (research protocol)}
+\label{alg:spear}
+\DontPrintSemicolon
+\KwIn{checkpoint $\theta_t$, failure history $h_t$, budget $b_t$,
+      replay $\M_t$, candidate set $\Delta_t\cup\{0\}$}
+initialize $e\leftarrow\varnothing$; source log $L\leftarrow\varnothing$\;
+\While{budget remains}{
+  estimate source values $\widehat V^{\rm PI}(a\mid s_t,e,\M_t)$\;
+  \If{$\max_a\widehat V^{\rm PI}(a)\le 0$}{break}
+  choose source $a$ (with logged exploration propensity)\;
+  acquire evidence $e_a$; append $(a,e_a,c_a)$ to $L$\;
+  update evidence context $e\leftarrow e\cup\{e_a\}$\;
+}
+generate bounded candidate updates from $(s_t,e)$, including $0$\;
+evaluate candidates and unchanged checkpoint on paired validation\;
+accept guarded best candidate or rollback to $\theta_t$\;
+log source actions, all candidate outcomes, and retention checks\;
+update $\eta,\phi,\omega$ from intervention-outcome replay\;
+\KwOut{persistent $\theta_{t+1}$, updated mechanism, versioned $\M_{t+1}$}
+\end{algorithm}
+
+A claim of \emph{recursive self-improvement} must be based on an
+\emph{incremental effect of learning $\psi$}. Growth of $\M_t$ alone
+is not sufficient: a frozen source policy and frozen generator
+must be compared with the adaptive versions under \emph{the same}
+memory content, number of candidate evaluations, and task stream.
+Only a reliable positive meta-learning effect supports the
+recursive part of the claim.
+
+\subsection{Distinguishing Information Gain From Rephrasing}
+If a teacher diagnosis is a deterministic function of the entire
+observed trace, it adds no Shannon information about a latent
+environment state conditional on that trace. It can nonetheless
+provide a computational advantage to a bounded-capacity generator
+by making the relevant pattern easier to use. The evaluation
+therefore separates (i) \emph{new external observations} from
+(ii) \emph{trace-only linguistic transformations}, and does not
+conflate either with successful weight-space learning.
