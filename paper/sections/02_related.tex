@@ -1,0 +1,61 @@
+\section{Related Work and Novelty Boundary}
+\label{sec:related}
+
+\paragraph{Reflection, tool use, and non-parametric experience.}
+ReAct interleaves reasoning and environment actions
+\citep{yao2023react}; Reflexion turns feedback into verbal memory without
+weight updates \citep{shinn2023reflexion}. SkillCommit evolves reusable
+external skills with behavioral validation \citep{he2026skillcommit},
+and SkillEvoReg controls overfitting and regressions in such evolving
+skill libraries \citep{nie2026skillevoreg}. These systems motivate
+credible baselines: the ability to act on feedback is not sufficient
+evidence for enduring parametric learning.
+
+\paragraph{Self-editing and text-to-parameters.}
+SEAL directly trains a model to emit effective self-edit instructions
+\citep{zweiger2025seal}, making it an especially close reference for
+recursive parameter adaptation. SIA jointly optimizes agent scaffolds and
+weights \citep{hebbar2026sia}. SkillSmith composes textual knowledge and
+parameterized prefix skills \citep{dery2026skillsmith}; KV-Skill learns
+loadable operators from text or rewards \citep{han2026kvskill}.
+Query-conditioned distributional hypernetworks generate distributions
+over LoRA updates \citep{khan2026distributional}. W2T predicts attributes
+from canonicalized LoRA weights \citep{han2026w2t}; BQ-LoRA models
+functional equivalence of agent updates \citep{zhou2026bqlora}.
+None of these observations licenses a claim that text-to-weight
+generation or functional weight geometry originated here.
+\spear{} instead asks how an agent should \emph{acquire evidence} to
+select and validate a durable update, conditional on the actual
+post-update benefit.
+
+\paragraph{Value of information, adaptive resources, and optimization.}
+Decision-theoretic information acquisition predates language agents.
+Recent work uses value of information for agent clarification
+\citep{dong2026voi} and for budgeted activation of LoRA experts
+\citep{saliencro2026vimole}. DeepControl studies adaptive evidence
+retrieval for \emph{inference-time reasoning}
+\citep{xiong2026deepcontrol}. Low-dimensional optimization of
+meaningful adaptation directions also has precedents in Hyper-ES
+\citep{gu2026hyperes} and CoPES \citep{wang2026copes}.
+Our proposed distinction is an \emph{intervention-conditioned acquisition
+objective}: a document, critique, or experiment is useful only insofar as
+it changes a future model-modification decision that survives validation.
+
+\paragraph{Parameter-efficient learning and continual retention.}
+LoRA provides practical low-rank parameter interventions
+\citep{hu2021lora}. Catastrophic forgetting motivates old-task audits
+and guarded acceptance rules \citep{kirkpatrick2017overcoming}.
+We treat preservation of previous capabilities as a measured objective,
+not an assumed property of restricting update rank.
+
+\paragraph{Closest-counterpart summary.}
+SEAL optimizes self-edit outcomes but does not, in its stated formulation,
+study \emph{which heterogeneous diagnostic evidence source to acquire}
+according to its value for the next parameter decision. SkillSmith and
+KV-Skill operationalize knowledge-to-parameter mappings but do not
+directly establish parameter-aware active diagnostic source selection.
+VOI-based clarification/retrieval methods optimize decisions over answers
+or computation rather than validated long-term parameter changes.
+These are \emph{hypothesized} distinctions to test, not a claim that
+the literature has been exhaustively searched or that a combination
+necessarily provides a publishable advance.
