@@ -1,0 +1,365 @@
+{
+  "protocol": "SPEAR synthetic parameter-intervention experiment v0.1",
+  "claim_boundary": "No LLM checkpoint, teacher API, real retrieval, AndroidWorld or AppWorld was run.",
+  "seed": 42,
+  "split_sizes": {
+    "direction_train": 180,
+    "source_value_train": 180,
+    "final_phase0_test": 240,
+    "meta_adaptation": 240,
+    "final_phase1_test": 240
+  },
+  "training_audit": {
+    "training_evidence_examples": 429,
+    "counterfactual_candidate_evaluations": 858,
+    "source_value_records": 540,
+    "direction_training_source_queries": 540,
+    "source_training_shared_queries": 540,
+    "source_training_candidate_evaluations": 434,
+    "static_source_training_candidate_evaluations": 434,
+    "static_source_value_records": 540,
+    "toy_training_query_cost_units": 43.2,
+    "toy_training_candidate_cost_units": 310.68
+  },
+  "reversal_audit": {
+    "matched_public_failure_pairs": 120,
+    "valid_matched_pairs": 120,
+    "pairs_with_opposite_best_parameter_update": 120,
+    "constructed_by_design": true,
+    "interpretation": "Synthetic reversal gate only; no inference about real LLMs."
+  },
+  "retention_audit": {
+    "shared_parameter_cases": 66,
+    "unsafe_updates_rejected": 66,
+    "note": "Toy old-weight spillover; not evidence of retention for LLMs."
+  },
+  "phase0_summary": {
+    "exhaustive_no_query": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 1.0,
+      "new_skill_gain": 0.5,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.1345,
+      "mean_synthetic_cost": 0.3655,
+      "mean_source_calls": 0,
+      "mean_candidate_validations": 2,
+      "accepted_updates": 240,
+      "rejected_updates": 0,
+      "no_update_proposals": 0
+    },
+    "fixed_docs_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.777083,
+      "new_skill_gain": 0.277083,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.092333,
+      "mean_synthetic_cost": 0.18475,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 0.779167,
+      "accepted_updates": 133,
+      "rejected_updates": 54,
+      "no_update_proposals": 53
+    },
+    "fixed_probe_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.797917,
+      "new_skill_gain": 0.297917,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.100833,
+      "mean_synthetic_cost": 0.197083,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 0.845833,
+      "accepted_updates": 143,
+      "rejected_updates": 60,
+      "no_update_proposals": 37
+    },
+    "fixed_teacher_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.795833,
+      "new_skill_gain": 0.295833,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.101,
+      "mean_synthetic_cost": 0.194833,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 0.8375,
+      "accepted_updates": 142,
+      "rejected_updates": 59,
+      "no_update_proposals": 39
+    },
+    "fixed_teacher_static": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.797917,
+      "new_skill_gain": 0.297917,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.103083,
+      "mean_synthetic_cost": 0.194833,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 0.8375,
+      "accepted_updates": 143,
+      "rejected_updates": 58,
+      "no_update_proposals": 39
+    },
+    "global_best_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.777083,
+      "new_skill_gain": 0.277083,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.092333,
+      "mean_synthetic_cost": 0.18475,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 0.779167,
+      "accepted_updates": 133,
+      "rejected_updates": 54,
+      "no_update_proposals": 53
+    },
+    "kind_rule_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.841667,
+      "new_skill_gain": 0.341667,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.145667,
+      "mean_synthetic_cost": 0.196,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 0.841667,
+      "accepted_updates": 164,
+      "rejected_updates": 38,
+      "no_update_proposals": 38
+    },
+    "no_update": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.5,
+      "new_skill_gain": 0.0,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.0,
+      "mean_synthetic_cost": 0.0,
+      "mean_source_calls": 0,
+      "mean_candidate_validations": 0,
+      "accepted_updates": 0,
+      "rejected_updates": 0,
+      "no_update_proposals": 240
+    },
+    "pi_voi_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.90625,
+      "new_skill_gain": 0.40625,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.18075,
+      "mean_synthetic_cost": 0.2255,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 1,
+      "accepted_updates": 195,
+      "rejected_updates": 45,
+      "no_update_proposals": 0
+    },
+    "pi_voi_static": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.90625,
+      "new_skill_gain": 0.40625,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.18075,
+      "mean_synthetic_cost": 0.2255,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 1,
+      "accepted_updates": 195,
+      "rejected_updates": 45,
+      "no_update_proposals": 0
+    },
+    "random_no_query": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.75,
+      "new_skill_gain": 0.25,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.0645,
+      "mean_synthetic_cost": 0.1855,
+      "mean_source_calls": 0,
+      "mean_candidate_validations": 1,
+      "accepted_updates": 120,
+      "rejected_updates": 120,
+      "no_update_proposals": 0
+    },
+    "random_source_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.795833,
+      "new_skill_gain": 0.295833,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.102,
+      "mean_synthetic_cost": 0.193833,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 0.829167,
+      "accepted_updates": 142,
+      "rejected_updates": 57,
+      "no_update_proposals": 41
+    },
+    "ready_rule_learned": {
+      "n_cases": 240,
+      "n_independent_matched_pairs": 120,
+      "strict_success": 0.904167,
+      "new_skill_gain": 0.404167,
+      "old_skill_drop": 0.0,
+      "net_utility": 0.178667,
+      "mean_synthetic_cost": 0.2255,
+      "mean_source_calls": 1,
+      "mean_candidate_validations": 1,
+      "accepted_updates": 194,
+      "rejected_updates": 46,
+      "no_update_proposals": 0
+    }
+  },
+  "phase0_paired_net_utility_comparisons": [
+    {
+      "n_pairs": 120,
+      "mean_difference": 0.035083,
+      "ci_95": [
+        0.0165,
+        0.054417
+      ],
+      "method": "pi_voi_learned",
+      "reference": "kind_rule_learned",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    },
+    {
+      "n_pairs": 120,
+      "mean_difference": 0.002083,
+      "ci_95": [
+        -0.0125,
+        0.016667
+      ],
+      "method": "pi_voi_learned",
+      "reference": "ready_rule_learned",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    },
+    {
+      "n_pairs": 120,
+      "mean_difference": 0.07975,
+      "ci_95": [
+        0.05,
+        0.111167
+      ],
+      "method": "pi_voi_learned",
+      "reference": "fixed_teacher_learned",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    },
+    {
+      "n_pairs": 120,
+      "mean_difference": 0.088417,
+      "ci_95": [
+        0.061667,
+        0.117333
+      ],
+      "method": "pi_voi_learned",
+      "reference": "global_best_learned",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    },
+    {
+      "n_pairs": 120,
+      "mean_difference": 0.07875,
+      "ci_95": [
+        0.051167,
+        0.104667
+      ],
+      "method": "pi_voi_learned",
+      "reference": "random_source_learned",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    },
+    {
+      "n_pairs": 120,
+      "mean_difference": 0.04625,
+      "ci_95": [
+        0.019167,
+        0.067083
+      ],
+      "method": "pi_voi_learned",
+      "reference": "exhaustive_no_query",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    },
+    {
+      "n_pairs": 120,
+      "mean_difference": 0.0,
+      "ci_95": [
+        0.0,
+        0.0
+      ],
+      "method": "pi_voi_learned",
+      "reference": "pi_voi_static",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    }
+  ],
+  "recursive_stress_test": {
+    "status": "controlled meta-learning stress test, NOT proof of recursive LLM improvement",
+    "phase0_replay_cases": 360,
+    "phase1_replay_cases_both_arms": 240,
+    "frozen_archive_cases": 600,
+    "adaptive_archive_cases": 600,
+    "adapted_meta_fit_records": {
+      "training_evidence_examples": 730,
+      "counterfactual_candidate_evaluations": 1460,
+      "source_value_records": 900,
+      "direction_training_source_queries": 900,
+      "source_training_shared_queries": 900,
+      "source_training_candidate_evaluations": 721,
+      "static_source_training_candidate_evaluations": 721,
+      "static_source_value_records": 900,
+      "toy_training_query_cost_units": 72.0,
+      "toy_training_candidate_cost_units": 522.36
+    },
+    "method_summary": {
+      "adaptive_meta": {
+        "n_cases": 240,
+        "n_independent_matched_pairs": 120,
+        "strict_success": 0.9,
+        "new_skill_gain": 0.4,
+        "old_skill_drop": 0.0,
+        "net_utility": 0.18,
+        "mean_synthetic_cost": 0.22,
+        "mean_source_calls": 0.991667,
+        "mean_candidate_validations": 0.979167,
+        "accepted_updates": 192,
+        "rejected_updates": 43,
+        "no_update_proposals": 5
+      },
+      "frozen_meta": {
+        "n_cases": 240,
+        "n_independent_matched_pairs": 120,
+        "strict_success": 0.860417,
+        "new_skill_gain": 0.360417,
+        "old_skill_drop": 0.0,
+        "net_utility": 0.140083,
+        "mean_synthetic_cost": 0.220333,
+        "mean_source_calls": 1,
+        "mean_candidate_validations": 0.979167,
+        "accepted_updates": 173,
+        "rejected_updates": 62,
+        "no_update_proposals": 5
+      }
+    },
+    "paired_difference": {
+      "n_pairs": 120,
+      "mean_difference": 0.039917,
+      "ci_95": [
+        0.012833,
+        0.066667
+      ],
+      "method": "adaptive_meta",
+      "reference": "frozen_meta",
+      "unit": "synthetic utility per case, grouped bootstrap by matched pair"
+    }
+  },
+  "gate_outcomes": {
+    "G1": "synthetic evidence intervention comparison recorded; check paired CIs before claiming improvement",
+    "G2": "constructed latent-opposite counterfactuals; compare learned PI-VOI to strong metadata rule",
+    "G3": "toy numeric weight persistence and guard verified; real LLM persistence NOT TESTED",
+    "G4": "frozen-versus-updated meta-components compared with identical replay archive; real RSI NOT TESTED"
+  }
+}

@@ -1,0 +1,206 @@
+\section{Experimental Design: Pre-registered, Not Yet Run}
+\label{sec:experiments}
+We organize evaluation around \emph{falsification}, not around maximizing
+a single benchmark score. No numerical outcomes for \spear{} are available
+in this manuscript. The protocol and a fuller execution checklist are
+provided in \code{EXPERIMENTS.md}.
+
+\subsection{Research Questions and Testbeds}
+\textbf{RQ1: Is external evidence causally useful for parameter updates?}
+Can acquiring evidence improve the \emph{validated future-task utility}
+of a parameter intervention over a trace-only update at matched cost?
+
+\textbf{RQ2: Does parameter-aware source selection matter?}
+When two failures have the same observable surface state, can a learned
+policy select different evidence sources for different latent causes
+and outperform fixed sources, confidence, and hand-written rules?
+
+\textbf{RQ3: Is the improvement persistent and retention-aware?}
+Does a committed update improve full trajectories on new task
+instances with all auxiliary evidence disabled, without unacceptable
+regression on previously learned skills?
+
+\textbf{RQ4: Does the improvement process itself improve?}
+With identical experience-log growth, does continuing to train
+the query and intervention policies improve the cost to learn
+\emph{later} skills compared with frozen meta-components?
+
+\paragraph{Stage A: controlled diagnosis environment.}
+Construct a resettable tool-use simulator with failures caused by
+hidden schema changes, task-invariant violations, or environment-state
+preconditions. Hold the visible error string and pre-query history
+constant across selected pairs. Equip each source with distinct,
+controlled access (manual snippet, advisory explanation, or executable
+probe); test whether evidence changes the \emph{optimal update}
+rather than merely identifying a label. Generate held-out
+combinations of names, tool schemas, causal mechanisms, and
+trajectory lengths. Randomize source availability/order to avoid
+position shortcuts. A nontrivial subset must contain a
+\emph{counterfactual reversal}: within the same visible failure
+condition, the best validated update differs across hidden causes.
+
+\paragraph{Stage B: interactive agent environments.}
+Evaluate transfer to AppWorld \citep{trivedi2024appworld}, which
+provides state-based unit tests for interactive tool use, and
+AndroidWorld \citep{rawles2024androidworld}, which provides
+parameterized mobile tasks and state-based checkers. Begin with
+a compact instruction-tuned student (candidate:
+Qwen3.5-4B, subject to reproducibility checks). Inject only
+documented, reproducible capability gaps; distinguish benchmark
+limitations (for example, failed resets or unavailable tool effects)
+from agent failures. Use full-trajectory strict checker success,
+not a language-model judgment, as the primary endpoint.
+No outcomes from Stage A should be copied into a Stage B result.
+
+\paragraph{Evaluation splits.}
+Separate (i) intervention-proposal training, (ii) within-round
+candidate-selection validation, (iii) meta-policy development,
+and (iv) final untouched testing, at the \emph{mechanism/skill}
+and task-instance levels. Keep old-skill retention suites fixed.
+For sequential learning, reveal skill families in stages; later
+test instances are unavailable during earlier adaptation.
+Snapshot environments and version all evidence.
+
+\subsection{Cost-Matched Comparators}
+\label{sec:baselines}
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{p{3.3cm}p{4.2cm}p{4.0cm}p{4.2cm}}
+\toprule
+\textbf{Method} & \textbf{Evidence acquisition} &
+\textbf{Parameter update} & \textbf{Isolated comparison}\\
+\midrule
+Unchanged student / memory-only &
+None or experience retrieval &
+None & Need for parameter change vs.\ external memory\\
+Fixed Teacher + SFT &
+Teacher on every eligible failure &
+Gradient-based supervised update &
+Standard verbal feedback and fine-tuning\\
+Fixed Sources + Hypernetwork &
+Fixed source order/bundle &
+Evidence-conditioned adapter predictor &
+Parameter generator without active evidence choice\\
+Contextual BO / functional ES &
+Budgeted trials selected from historical gain &
+Low-dimensional update search &
+Generic black-box optimization of updates\\
+Heuristic / confidence routing &
+Simple error rules or confidence thresholds &
+Same update generator as full method &
+Whether learned \pivoi{} beats trivial routing\\
+Evidence Policy Only &
+Learned source policy &
+Frozen update generator &
+Marginal benefit of acquisition learning\\
+Intervention Model Only &
+Fixed source policy &
+Learned functional intervention generator &
+Marginal benefit of intervention learning\\
+Full \spear{} &
+Learned parameter-aware source policy &
+Learned functional generator; guarded updates &
+Effect of joint decision coupling\\
+Frozen-meta \spear{} &
+Frozen policies; replay archive still grows &
+Frozen generator; matched archive and budget &
+Gain attributable to recursive learning\\
+\bottomrule
+\end{tabular}
+\caption{Planned controls. All methods should receive a comparable
+source-query, candidate-evaluation, and GPU-hour budget, and
+the same versioned task stream. Results are intentionally absent.}
+\label{tab:baselines}
+\end{table*}
+
+The most important comparisons are \emph{not} with the weakest
+student: the main claim must survive (a) simple deterministic
+routing, (b) fixed expert evidence, (c) a standard update mechanism
+with an adaptive source selector, and (d) a strong learned update
+mechanism with fixed sources. Where a named baseline has
+unavailable code, describe and validate the faithful
+reimplementation instead of claiming an exact reproduction.
+
+\subsection{Metrics and Estimands}
+\label{sec:metrics}
+\begin{itemize}
+\item \textbf{Primary endpoint:} strict end-to-end success on
+      independent \emph{new} task instances after an accepted
+      parameter update, at matched cumulative budget.
+\item \textbf{Sample and cost efficiency:} verified skill gain per
+      teacher call, retrieval call, simulator probe, GPU-hour,
+      trained token, and total normalized expense.
+\item \textbf{Retention:} average drop and worst-skill drop on the
+      pre-registered old-task suite, with side-effect violations.
+\item \textbf{Value prediction:} signed prediction error, ranking
+      regret, calibration, and false-acceptance rate of
+      $Q_\omega$ and estimated \pivoi{}.
+\item \textbf{Source-policy increment:} paired utility relative to
+      fixed sources, confidence, and best hand-written rule
+      under matched queries and candidate counts.
+\item \textbf{Recursive gain:} area under the skill-acquisition
+      curve, later-skill improvement per expense, and adaptive
+      minus frozen-meta learning efficiency at identical replay size.
+\end{itemize}
+
+The primary causal estimand is the \emph{difference in post-update
+utility under a randomized evidence-source policy} at a fixed
+checkpoint and intervention-validation budget. Report results by
+latent cause and by visible-failure stratum, not just in aggregate.
+A source-selection effect should include a check that update choices
+actually differ after evidence; success alone may be due to more
+computation.
+
+\subsection{Paired Evaluation and Statistical Reporting}
+At each eligible decision, branch from the same checkpoint and
+resettable environment. Use paired seeds for untreated and candidate
+updates, randomized source assignments where valid, and
+independent final evaluation seeds. Publish the full denominator,
+technical-error exclusions, source propensities, cost ledger,
+and confidence intervals. A priori sample size should be chosen
+through pilot-based power analysis; the final test set and
+analysis rules must be frozen before model selection.
+Use a hierarchical or paired bootstrap across task mechanisms
+and random seeds, with a pre-specified correction for multiple
+primary comparisons. Report inconclusive results as inconclusive.
+
+\subsection{Falsification Gates and Critical Ablations}
+The proposed sequence includes four \emph{go/no-go gates}:
+\begin{enumerate}
+\item \textbf{Evidence gate.} At fixed update budget, new external
+      evidence improves validated adaptation over trace-only
+      updates; distinguish this from paraphrasing the trace.
+\item \textbf{Conditional reversal gate.} Within matched observable
+      conditions, the best intervention (including no update)
+      genuinely changes with additional evidence. If a
+      one-condition rule is sufficient, do not train a large router.
+\item \textbf{Persistence gate.} A committed update retains gains on
+      new full trajectories with consultant text and retrieval off,
+      and does not breach the old-skill regression tolerance.
+\item \textbf{Recursion gate.} Learning $\eta$ and $\phi$ improves
+      later update quality beyond the same replay archive with
+      both components frozen.
+\end{enumerate}
+
+Run text-shuffled, source-masked, trace-only paraphrase,
+oracle-evidence, basis-only, residual-only, no-update, and
+no-retention-gate ablations. Randomize nominal tool names and
+document layouts; hold out mechanism combinations so gains
+cannot be attributed to a memorized lookup table. If the gates
+fail, the corresponding novelty or RSI claim must be narrowed.
+
+\paragraph{Result-reporting policy.}
+The evaluation tables above specify \emph{methods and outcomes to
+measure}; they contain no experimental values. A future Results
+section should be added only with artifact-linked raw runs,
+strict-checker audit trails, and the declared statistical analysis.
+
+\paragraph{Executable mechanism check.}
+A separately marked, CPU-only prototype of the controlled
+counterfactual protocol, including real-run audit schemas, is available
+under \code{experiments/parameter\_voi/}. This prototype uses a
+synthetic two-weight student and simulated evidence sources: it does
+\emph{not} constitute an experiment on LLM agents or evidence that
+any of the paper-grade gates above have been met.

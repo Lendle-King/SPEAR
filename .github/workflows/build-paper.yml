@@ -1,0 +1,32 @@
+name: Compile manuscript
+
+on:
+  push:
+    branches:
+      - 'paper/**'
+    paths:
+      - 'paper/**'
+      - '.github/workflows/build-paper.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: LaTeX smoke test and PDF artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Compile paper (PDFLaTeX + BibTeX)
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main.tex
+          working_directory: paper
+      - name: Upload draft PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: SPEAR-initial-paper-draft
+          path: paper/main.pdf
+          if-no-files-found: error

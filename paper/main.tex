@@ -1,0 +1,75 @@
+\documentclass[10pt,twocolumn]{article}
+
+% Portable working-paper format. Venue-specific style can replace this
+% preamble without changing the scientific content.
+\usepackage[a4paper,margin=0.72in,columnsep=0.26in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,multirow,array}
+\usepackage{xcolor,graphicx}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage[round,authoryear]{natbib}
+\usepackage[colorlinks=true,citecolor=blue!45!black,
+            linkcolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
+\setlist[itemize]{leftmargin=*,itemsep=2pt,topsep=3pt}
+\setlist[enumerate]{leftmargin=*,itemsep=2pt,topsep=3pt}
+\setlength{\parskip}{2pt}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newcommand{\spear}{\textsc{SPEAR}}
+\newcommand{\pivoi}{\textsc{PI-VOI}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{\vspace{-0.5cm}\textbf{SPEAR: Learning What Evidence to Seek for\\
+Parameter-Level Self-Improvement in LLM Agents}}
+\author{Anonymous authors\\
+\small Working manuscript; author list and affiliation to be finalized}
+\date{\small October 30, 2026 \quad|\quad Conceptual draft; experiments not yet reported}
+
+\begin{document}
+\maketitle
+\vspace{-0.4cm}
+\begin{abstract}
+Long-horizon language-model agents can recognize execution failures yet remain
+poor at deciding what evidence to collect to improve their \emph{future model
+parameters}. Existing reflection, retrieval, and self-adaptation techniques
+address pieces of this process, but a central decision remains underspecified:
+which diagnostic query is most valuable \emph{because of the parameter
+intervention it enables}? We formulate this problem as parameter-intervention
+value of information (\pivoi), in which the benefit of querying a teacher,
+consulting documentation, or conducting a controlled probe is measured by the
+expected downstream value of the best subsequently verifiable parameter update,
+net of acquisition cost. We present \spear{} (Self-improvement through Probing,
+Evidence Acquisition, and Reparameterization), a proposed framework coupling
+a parameter-aware diagnostic policy, an evidence-conditioned functional
+intervention generator, and a counterfactual acceptance-and-replay loop.
+A recursive extension learns the diagnostic and intervention policies from
+measured update outcomes rather than merely growing an experience archive.
+We provide a falsifiable, cost-matched experimental protocol separating
+incremental information from linguistic reformatting, persistent adaptation
+from transient routing, and recursive improvement from memory accumulation.
+\textbf{This is a method proposal: empirical claims about \spear{} are
+intentionally deferred pending execution.}
+\end{abstract}
+
+\input{sections/01_introduction}
+\input{sections/02_related}
+\input{sections/03_method}
+\input{sections/04_evaluation}
+\input{sections/05_discussion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+\end{document}
