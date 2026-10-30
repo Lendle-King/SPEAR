@@ -1,0 +1,59 @@
+name: SPEAR PI-VOI synthetic verification
+
+on:
+  push:
+    branches:
+      - 'paper/**'
+    paths:
+      - 'experiments/**'
+      - '.github/workflows/verify-parameter-voi.yml'
+  pull_request:
+    paths:
+      - 'experiments/**'
+      - '.github/workflows/verify-parameter-voi.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu-falsification:
+    name: Synthetic gates, 19 tests, structured output
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run invariants and audit tests
+        run: python -m unittest discover -s experiments/parameter_voi/tests -v
+      - name: Reproduce declared toy experiment
+        run: |
+          python -m experiments.parameter_voi.run \
+            --seed 42 --train 360 --test 240 \
+            --meta-train 240 --meta-test 240 \
+            --out "$RUNNER_TEMP/spear-synthetic"
+      - name: Check split isolation and result manifest
+        env:
+          OUT: ${{ runner.temp }}/spear-synthetic
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          folder = pathlib.Path(os.environ['OUT'])
+          data = json.loads((folder / 'summary.json').read_text())
+          assert data['split_sizes']['final_phase0_test'] == 240
+          assert data['reversal_audit']['valid_matched_pairs'] == 120
+          assert 'ready_rule_learned' in data['phase0_summary']
+          assert data['recursive_stress_test']['frozen_archive_cases'] == data['recursive_stress_test']['adaptive_archive_cases']
+          assert 'No LLM checkpoint' in data['claim_boundary']
+          assert sum(1 for _ in (folder / 'phase0_trials.jsonl').open()) == 13 * 240
+          print('Validated synthetic-only audit manifest.')
+          PY
+      - name: Publish synthetic audit (NOT LLM benchmark)
+        uses: actions/upload-artifact@v4
+        with:
+          name: SPEAR-synthetic-pivoi-seed42
+          path: ${{ runner.temp }}/spear-synthetic/
+          if-no-files-found: error
+          retention-days: 30
