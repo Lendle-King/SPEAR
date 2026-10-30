@@ -106,3 +106,21 @@ Before a claimed result appears in the manuscript, provide the raw-run path, cod
 The planned mechanism gates now have a runnable **synthetic** implementation in [`experiments/parameter_voi/`](../experiments/parameter_voi/README.md) with standard-library Python, 19 tests, reproducible CLI, raw-run JSONL exports, matched-pair confidence intervals, and a real-run JSONL audit adapter. The CI workflow is [`verify-parameter-voi.yml`](../.github/workflows/verify-parameter-voi.yml). A seed-42 [toy result audit](../experiments/parameter_voi/results/interpretation.md) is tracked separately from the paper.
 
 **Do not regard those simulated tests as the manuscript's empirical Results.** In the toy benchmark a strong readiness rule matches learned PI-VOI within uncertainty, while a static semantic direction matches the learned intervention generator exactly; external model/agent experiments are necessary. The real-model G1–G4 gates in this document remain unpassed.
+
+## Implemented real-weight feasibility pilot (October 30, 2026)
+
+See `experiments/real_lora/README.md`. A new optional CUDA/PEFT training
+runner implements three pre-query-identical tool rejection mechanisms,
+train-only teacher/docs/probe diagnostic fixtures, one independent LoRA per
+(target mechanism, source) arm, matched paired baseline/adapter full-trajectory
+checks on family-separated validation and untouched test sets, and validation
+acceptance with old-skill rollback. The controlled equal-label supervision
+means this study isolates the *effect of diagnostic text in training* rather
+than a causal benefit from collecting more correct labels.
+
+This is **not** AndroidWorld, not a live teacher API experiment, and not
+yet an implementation of learned PI-VOI or recursive policy updates.
+The source matrix, simple rule, and validation-best arm are necessary
+precursors for measuring conditional post-update benefits. If the blind
+same-label LoRA matches diagnosis-conditioned LoRAs, record that negative
+finding instead of extrapolating the synthetic 90.6% score to Qwen.
