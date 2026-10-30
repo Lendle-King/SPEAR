@@ -1,0 +1,64 @@
+name: SPEAR real-LoRA protocol CPU checks
+
+on:
+  push:
+    branches: [main, 'paper/**', 'experiment/**']
+    paths:
+      - 'experiments/real_lora/**'
+      - '.github/workflows/verify-real-lora-protocol.yml'
+  pull_request:
+    paths:
+      - 'experiments/real_lora/**'
+      - '.github/workflows/verify-real-lora-protocol.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  protocol-cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and test invariants; no model/GPU/API needed
+        run: |
+          python -m compileall -q experiments/real_lora
+          python -m unittest discover -s experiments/real_lora/tests -v
+      - name: Produce deterministic manifest and inspect plan
+        run: |
+          python -m experiments.real_lora.prepare --seed 42 \
+            --train-groups 4 --validation-groups 2 --test-groups 3 \
+            --out "$RUNNER_TEMP/spear/manifest.json"
+          python -m experiments.real_lora.run plan \
+            --manifest "$RUNNER_TEMP/spear/manifest.json" \
+            --out "$RUNNER_TEMP/spear"
+          MANIFEST="$RUNNER_TEMP/spear/manifest.json" python - <<'PY'
+          from experiments.real_lora.prepare import load_manifest
+          import os
+          from collections import defaultdict
+          d = load_manifest(os.environ['MANIFEST'])
+          assert len(d['cases']) == (4 + 2 + 3) * 3
+          families = defaultdict(set)
+          for c in d['cases']:
+              families[c['family_id']].add(c['split'])
+          assert all(len(v) == 1 for v in families.values())
+          assert d['evidence'] == 'controlled_fixture_not_live_teacher_or_web'
+          print('CPU protocol preflight passed; no real LoRA was trained.')
+          PY
+      - name: Check guarded GPU script without loading weights
+        run: |
+          bash -n experiments/real_lora/run_matrix.sh
+          MODEL=unused BASE_ID=mock-immutable CUDA_VISIBLE_DEVICES="" \
+            TRAIN_GROUPS=2 VAL_GROUPS=2 TEST_GROUPS=2 \
+            RUN_ROOT="$RUNNER_TEMP/spear/dryrun" \
+            bash experiments/real_lora/run_matrix.sh
+      - name: Upload only CPU manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: SPEAR-real-LoRA-manifest-CPU-only
+          path: ${{ runner.temp }}/spear/manifest.json
+          if-no-files-found: error
