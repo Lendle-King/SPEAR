@@ -18,8 +18,8 @@ import random
 import statistics
 import time
 
-from .benchmark import (Case, MECHANISMS, SOURCES, SOURCE_FOR, rollout,
-                        source_report, training_examples)
+from .benchmark import (Case, MECHANISMS, SOURCES, SOURCE_FOR, Transaction,
+                        same_input_source_rule, rollout, source_report, training_examples)
 from .prepare import canonical_hash, load_manifest
 
 
@@ -211,6 +211,14 @@ def evaluate(args: argparse.Namespace) -> None:
     chosen = decision(validation, args.target, args.min_gain, args.old_tolerance)
     test = [row for row in results if row["split"] == "test"]
     target_test = [row for row in test if row["mechanism"] == args.target]
+    # The strong rule sees only an ordinary local inspection, never a hidden
+    # mechanism label. It must be computed before final test selection.
+    public_choices = {same_input_source_rule(Transaction(case).step(
+                         {"tool": "inspect_failure", "args": {}}))
+                      for case in all_cases(manifest, split="validation", mechanism=args.target)}
+    if len(public_choices) != 1:
+        raise ValueError("validation symptoms do not admit a single public rule choice")
+    public_rule_source = next(iter(public_choices))
     by_mechanism = {name: {"n": len([r for r in test if r["mechanism"] == name]),
                            "baseline": round(mean_success([r for r in test if r["mechanism"] == name], "baseline"), 6),
                            "candidate": round(mean_success([r for r in test if r["mechanism"] == name], "candidate"), 6)}
@@ -221,6 +229,8 @@ def evaluate(args: argparse.Namespace) -> None:
                "model": args.model, "revision": args.revision, "base_id": args.base_id,
                "source": meta["source"], "evidence_origin": meta["evidence_origin"],
                "target_mechanism": args.target,
+               "same_input_rule_source_from_local_inspection": public_rule_source,
+               "same_input_rule_local_inspection_count": len(all_cases(manifest, split="validation", mechanism=args.target)),
                "adapter_sha256": meta["adapter_sha256"],
                "train": meta["backend"],
                "selection": chosen,
@@ -329,10 +339,17 @@ def assemble_report(paths: list[Path]) -> dict:
     heuristic = []
     val_select = []
     for target, arms in by_target.items():
-        if SOURCE_FOR[target] in arms:
-            heuristic.append({"target":target,"source":SOURCE_FOR[target],
-                              "test_deployed_success":arms[SOURCE_FOR[target]]["test_deployed_success"],
-                              "requires_prequery_local_inspection":True})
+        # Use only the public tool-response-derived value recorded at validation.
+        choices = {x.get("same_input_rule_source_from_local_inspection")
+                   for x in summaries if x["target_mechanism"] == target}
+        if len(choices) != 1:
+            raise ValueError("inconsistent public rule source across adapters")
+        public_choice = next(iter(choices))
+        if public_choice in arms:
+            heuristic.append({"target":target,"source":public_choice,
+                              "test_deployed_success":arms[public_choice]["test_deployed_success"],
+                              "requires_prequery_local_inspection":True,
+                              "mechanism_id_was_not_used_for_rule":True})
         # Selection based on the *validation split only*, with all arm training
         # and validation costs charged to the protocol, never retrospectively
         # claiming online acquisition efficiency.
