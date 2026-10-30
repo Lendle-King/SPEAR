@@ -31,3 +31,14 @@ Compile with `cd paper && make` in a TeX Live environment. A GitHub Actions buil
 - [GitHub Actions validation](.github/workflows/verify-parameter-voi.yml): 19 invariant/unit tests, deterministic synthetic experiment, raw trial artifacts
 
 **Important distinction:** the CPU experiment changes persistent parameters of a tiny toy model, **not** a Qwen/AndroidWorld agent. On the seeded synthetic benchmark PI-VOI does not meaningfully beat the strong same-input readiness rule, and its learned intervention generator ties the static semantic rule. These negative controls remain visible; genuine LLM evidence is not yet reported.
+
+## New: real-weights LoRA intervention pilot
+
+The [counterfactual real-LoRA experiment](experiments/real_lora/README.md) adds an
+explicitly opt-in CUDA Transformers/PEFT runner for three matched tool failure
+mechanisms (schema, policy, stale state), four training diagnosis conditions
+(blind, docs, teacher, probe), independent adapters from a pinned base,
+paired full-trajectory validation/test, and old-skill/compute audits.
+[CPU protocol CI](.github/workflows/verify-real-lora-protocol.yml) checks the
+split, checker and leakage safeguards without downloading a model.
+**No Qwen3.5-4B training or AndroidWorld results are reported yet.**
