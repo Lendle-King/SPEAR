@@ -20,3 +20,8 @@ __pycache__/
 .venv/
 results/parameter_voi_cpu/
 experiments/parameter_voi/results/*.jsonl
+
+# Locally generated real-LoRA checkpoints, manifests and results
+runs/
+**/adapter_model.safetensors
+**/adapter_model.bin
