@@ -7,7 +7,7 @@ import unittest
 
 from experiments.real_lora.benchmark import (
     MECHANISMS, SOURCES, Transaction, as_json, make_cases, parse_action,
-    rollout, source_report, training_examples)
+    rollout, source_report, training_examples, same_input_source_rule)
 from experiments.real_lora.prepare import load_manifest, prepare
 from experiments.real_lora.run import (
     assemble_report, build_training_rows, check_metadata, decision,
@@ -36,6 +36,14 @@ class RealLoRAProtocolTests(unittest.TestCase):
             tools.append(env.gold_actions()[1]["tool"])
         self.assertEqual(len({json.dumps(o,sort_keys=True) for o in inspections}),3)
         self.assertEqual(set(tools),{"rename_field","cap_units","refresh_revision"})
+
+    def test_strong_rule_reads_only_public_local_inspection(self):
+        for case in self.cases:
+            observation = Transaction(case).step({"tool":"inspect_failure","args":{}})
+            # This is an expected checker property. The rule receives only
+            # observation, not case, hidden mechanism, or experiment labels.
+            expected = {"schema":"docs", "policy":"teacher", "stale":"probe"}[case.mechanism]
+            self.assertEqual(same_input_source_rule(observation), expected)
 
     def test_gold_trajectories_all_strict(self):
         for c in self.cases:
