@@ -1,0 +1,14 @@
+# Local LaTeX build products and editor scratch
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+paper/main.pdf
+.DS_Store
