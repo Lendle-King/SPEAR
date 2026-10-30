@@ -289,3 +289,19 @@ def rollout(case: Case, respond: Callable[[list[dict]], str], max_steps: int = 5
             "episode_done": env.done, "steps": env.steps,
             "side_effects": env.side_effects, "trace": env.history,
             "heldout_no_teacher_or_docs": True}
+
+
+def same_input_source_rule(inspect_observation: dict) -> str:
+    """Select a diagnosis source using ONLY a permissible local tool reply.
+
+    No experiment-only mechanism ID, hidden case attributes, or test labels
+    are supplied to this rule. Charge the local inspection cost separately.
+    """
+    fields = inspect_observation.get("detail", {})
+    if {"observed_field", "required_field"} <= set(fields):
+        return "docs"
+    if {"requested_units", "safe_cap"} <= set(fields):
+        return "teacher"
+    if {"submitted_revision", "latest_revision"} <= set(fields):
+        return "probe"
+    raise ValueError("local inspection does not identify a supported symptom")
