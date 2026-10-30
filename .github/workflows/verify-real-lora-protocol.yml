@@ -49,6 +49,13 @@ jobs:
           assert d['evidence'] == 'controlled_fixture_not_live_teacher_or_web'
           print('CPU protocol preflight passed; no real LoRA was trained.')
           PY
+      - name: Check guarded GPU script without loading weights
+        run: |
+          bash -n experiments/real_lora/run_matrix.sh
+          MODEL=unused BASE_ID=mock-immutable CUDA_VISIBLE_DEVICES="" \
+            TRAIN_GROUPS=2 VAL_GROUPS=2 TEST_GROUPS=2 \
+            RUN_ROOT="$RUNNER_TEMP/spear/dryrun" \
+            bash experiments/real_lora/run_matrix.sh
       - name: Upload only CPU manifest
         uses: actions/upload-artifact@v4
         with:
