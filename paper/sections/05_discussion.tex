@@ -1,0 +1,58 @@
+\section{Discussion, Limitations, and Research Integrity}
+\label{sec:discussion}
+
+\paragraph{Intervention-conditioned novelty is a hypothesis.}
+A value-of-information objective becomes substantively interesting
+only when source acquisition and model modification are
+\emph{coupled in observed decisions}. It is possible that a fixed
+teacher, an error-rule lookup table, or a standard contextual
+optimizer matches \spear{} once every baseline receives equal
+compute. In that case, a defensible conclusion is that
+parameter-aware acquisition adds no measurable advantage in the
+tested setting.
+
+\paragraph{Diagnostic quality is not intervention utility.}
+A correct teacher explanation may fail to translate into a
+transferable update; an explanation that merely paraphrases
+known trace state cannot create additional Shannon information
+about hidden state. Improvements from such text should be
+attributed to computational representation or inductive bias,
+not new external knowledge.
+
+\paragraph{Model changes can damage old skills.}
+Low-rank updates and adapter isolation do not guarantee retention.
+Rollback, versioned checkpoints, and old-skill audits are necessary.
+Policies learned from a small candidate library may also overfit
+to a single backbone, simulator, or error taxonomy. Updates from
+a mismatched parameter basis should be rejected.
+
+\paragraph{Counterfactual measurement is expensive.}
+Paired post-update evaluation may dominate total cost; repeated
+validation can create selection bias and spuriously optimistic
+acceptance. The study must disclose cumulative cost, failed
+attempts, multiplicity handling, and the number of adaptive
+choices made on a development set. Test leakage can arise through
+retrieved documentation, teacher answers, and persistent
+experience archives, not just conventional gradient training.
+
+\paragraph{Safety and deployment considerations.}
+Autonomous parameter updates may amplify tool misuse or
+unsafe behavior. The initial study should run in sandboxed,
+resettable environments with restricted tools, reviewable update
+diffs, and strict rollback. Real deployments require additional
+security, privacy, and regression audits.
+
+\section{Conclusion}
+\label{sec:conclusion}
+We have specified \spear{} as a \emph{proposed} framework for
+evidence-seeking, parameter-level improvement of LLM agents.
+Its central question is whether an agent can learn \emph{what
+to investigate in order to change its future parameters well}.
+The hypothesis is operationalized as parameter-intervention
+value of information, a constrained evidence-to-update mapping,
+and counterfactual validation of persistent model changes.
+The defining experiments compare those mechanisms against
+simple source rules, fixed sources, existing update generators,
+and frozen-meta controls at matched resources.
+Whether the method yields genuine recursive self-improvement
+remains an empirical question.
